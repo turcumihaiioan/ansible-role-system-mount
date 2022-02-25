@@ -1,0 +1,51 @@
+---
+- name: running system_mount tasks
+  block:
+    - name: ensuring/mounting mount points
+      ansible.posix.mount:
+        backup: "{{ item['value']['backup'] | default(omit) }}"
+        boot: "{{ item['value']['boot'] | default(omit) }}"
+        dump: "{{ item['value']['dump'] | default(omit) }}"
+        fstab: "{{ item['value']['fstab'] | default(omit) }}"
+        fstype: "{{ item['value']['fstype'] }}"
+        opts: "{{ item['value']['opts'] | default(omit) }}"
+        passno: "{{ item['value']['passno'] | default(omit) }}"
+        path: "{{ item['value']['path'] }}"
+        src: "{{ item['value']['src'] }}"
+        state: "{{ item['value']['state'] }}"
+      loop: "{{ system_mount | dict2items }}"
+      loop_control:
+        label: "{{ item['value'] }}"
+      when:
+        - item['value']['fstype'] is defined
+        - item['value']['path'] is defined
+        - item['value']['src'] is defined
+        - item['value']['state'] is defined
+        - item['value']['state'] in ["mounted","present"]
+
+    - name: remounting mount points
+      ansible.posix.mount:
+        opts: "{{ item['value']['opts'] | default(omit) }}"
+        path: "{{ item['value']['path'] }}"
+        state: "{{ item['value']['state'] }}"
+      loop: "{{ system_mount | dict2items }}"
+      loop_control:
+        label: "{{ item['value'] }}"
+      when:
+        - item['value']['path'] is defined
+        - item['value']['state'] is defined
+        - item['value']['state']== "remounted"
+
+    - name: removing/unmounting mount points
+      ansible.posix.mount:
+        path: "{{ item['value']['path'] }}"
+        state: "{{ item['value']['state'] }}"
+      loop: "{{ system_mount | dict2items }}"
+      loop_control:
+        label: "{{ item['value'] }}"
+      when:
+        - item['value']['path'] is defined
+        - item['value']['state'] is defined
+        - item['value']['state'] in ["absent","unmounted"]
+  when:
+    system_mount is defined
