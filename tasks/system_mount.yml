@@ -1,0 +1,38 @@
+---
+- name: "{{ system_mount_item['key'] }} : ensuring/mounting mount points"
+  ansible.posix.mount:
+    backup: "{{ system_mount_item['value']['backup'] | default(omit) }}"
+    boot: "{{ system_mount_item['value']['boot'] | default(omit) }}"
+    dump: "{{ system_mount_item['value']['dump'] | default(omit) }}"
+    fstab: "{{ system_mount_item['value']['fstab'] | default(omit) }}"
+    fstype: "{{ system_mount_item['value']['fstype'] }}"
+    opts: "{{ system_mount_item['value']['opts'] | default(omit) }}"
+    passno: "{{ system_mount_item['value']['passno'] | default(omit) }}"
+    path: "{{ system_mount_item['value']['path'] }}"
+    src: "{{ system_mount_item['value']['src'] }}"
+    state: "{{ system_mount_item['value']['state'] }}"
+  when:
+    - system_mount_item['value']['fstype'] is defined
+    - system_mount_item['value']['path'] is defined
+    - system_mount_item['value']['src'] is defined
+    - system_mount_item['value']['state'] is defined
+    - system_mount_item['value']['state'] in ["mounted","present"]
+
+- name: "{{ system_mount_item['key'] }} : remounting mount points"
+  ansible.posix.mount:
+    opts: "{{ system_mount_item['value']['opts'] | default(omit) }}"
+    path: "{{ system_mount_item['value']['path'] }}"
+    state: "{{ system_mount_item['value']['state'] }}"
+  when:
+    - system_mount_item['value']['path'] is defined
+    - system_mount_item['value']['state'] is defined
+    - system_mount_item['value']['state']== "remounted"
+
+- name: "{{ system_mount_item['key'] }} : removing/unmounting mount points"
+  ansible.posix.mount:
+    path: "{{ system_mount_item['value']['path'] }}"
+    state: "{{ system_mount_item['value']['state'] }}"
+  when:
+    - system_mount_item['value']['path'] is defined
+    - system_mount_item['value']['state'] is defined
+    - system_mount_item['value']['state'] in ["absent","unmounted"]
