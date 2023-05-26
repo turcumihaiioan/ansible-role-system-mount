@@ -1,6 +1,6 @@
 ---
 - name: running system_mount tasks
-  include_tasks: system_mount.yml
+  ansible.builtin.include_tasks: system_mount.yml
   loop: "{{ system_mount | dict2items }}"
   loop_control:
     label: "{{ system_mount_item['key'] }}"
