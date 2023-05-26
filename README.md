@@ -1,7 +1,7 @@
 system_mount
 =========
 
-This role allows you to use the ansible.posix.mount to control active and configured mount points in /etc/fstab.
+This role allows you to use the ansible.posix.mount module to control active and configured mount points in /etc/fstab.
 
 Requirements
 ------------
